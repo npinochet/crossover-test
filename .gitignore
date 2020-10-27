@@ -1,0 +1,31 @@
+node_modules
+
+# compiled output
+frontend/dist
+frontend/tmp
+frontend/out-tsc
+
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
+
+# IDEs and editors
+.vscode/*
+frontend/.idea
+.project
+.classpath
+*.launch
+.settingsfrontend/
+*.sublime-workspace
+
+# misc
+frontend/connect.lock
+frontend/coverage
+frontend/libpeerconnection.log
+npm-debug.log
+testem.log
+frontend/typings
+
+# System Files
+.DS_Store
+Thumbs.db
