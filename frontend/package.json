@@ -3,11 +3,16 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "npm run serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "serve": "npm run serve:local",
+    "serve:local": "npm run environment:local; ng serve --configuration=local --host 0.0.0.0 --port 8080",
+    "serve:prod": "npm run environment:prod; ng serve --configuration=production",
+    "environment:local": "cp src/environments/environment.local.ts src/environments/environment.ts",
+    "environment:prod": "cp src/environments/environment.prod.ts src/environments/environment.ts"
   },
   "private": true,
   "dependencies": {
