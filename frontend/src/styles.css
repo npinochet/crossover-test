@@ -1,1 +1,63 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  /* Variables */
+  --color-primary: #45ADA8;
+  --color-secondary: #9EE1AE;;
+  --color-dark: #594F4F;
+  --color-light: #E5FCC2;
+  --color-red: #FF0000;
+
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-primary);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+h1, p, label {
+  margin: 0;
+  color: var(--color-secondary);
+  font-size: 16px;
+}
+
+h1 {
+  font-size: 30px;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 3px;
+  border: 0px solid var(--color-secondary);
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--color-light);
+}
+
+button[disabled] {
+  background-color: var(--color-dark);
+  cursor: unset;
+}
+
+input {
+  color: var(--color-dark);
+  background-color: var(--color-light);
+  border: 1px solid var(--color-dark);
+  font-size: 16px;
+  flex: 1;
+  height: max-content;
+}
+
+input[type="file"] {
+  color: var(--color-secondary);
+  background-color: unset;
+  border: 0;
+}
+
+label {
+  margin: 5px 0;
+  padding-right: 10px;
+}

@@ -1,14 +1,11 @@
-const PROD = process.env.NODE_ENV === 'production';
-
-if (!PROD) require('dotenv').config();
-const dbconfig = PROD ? require('opswork') : require('./db');
+require('dotenv').config();
 const package = require('./package.json');
 const express = require('express');
+const cors = require('cors')
 const mysql = require('mysql');
 const uuid = require('uuid');
 const morgan = require('morgan');
 const AWS = require('aws-sdk');
-//AWS.setSDKInstance(require('aws-sdk'));
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -17,19 +14,19 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan('combined'));
-
 const pool = mysql.createPool({
   connectionLimit : 10,
-  host: dbconfig.db['host'],
-  user: dbconfig.db['username'],
-  password: dbconfig.db['password'],
-  port: dbconfig.db['port'],
-  database: dbconfig.db['database']
+  host: process.env.RDS_HOST,
+  user: process.env.RDS_USER,
+  password: process.env.RDS_PASSWORD,
+  port: process.env.RDS_PORT,
+  database: process.env.RDS_NAME
 });
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: '*' }))
+app.use(morgan('combined'));
 
 const getBase64Buffer = base64 => {
   const imageFileTypes = ['jpeg', 'jpg', 'png'];
@@ -39,16 +36,18 @@ const getBase64Buffer = base64 => {
   return { buffer, type };
 };
 
-const dbInsertQuery = (uuid, desc, type, size) => {
+const dbInsertQuery = (uuid, desc, size, type) => {
   return new Promise((res, rej) => {
-    pool.query('INSERT INTO ? ?', [uuid, desc], (err, data) => {
+    const query = `INSERT INTO Images VALUES (?, ?, ?, ?);`;
+    const values = [uuid, desc, size, type];
+    pool.query(query, values, (err, data) => {
       if (err) throw rej(err);
       res(data);
     });
   })
 }
 
-const uploadBase64ToS3 = async (base64) => {
+const uploadBase64ToS3 = async base64 => {
   const { buffer, type } = getBase64Buffer(base64);
   const id = uuid.v4();
   const params = {
@@ -58,9 +57,14 @@ const uploadBase64ToS3 = async (base64) => {
     ContentEncoding: 'base64',
     ContentType: `image/${type}`
   };
-  const result = await s3.upload(params).promise();
-  console.log(`File uploaded successfully. ${result.Location}`);
-  return { id, result };
+  const { Location } = await s3.upload(params).promise();
+  console.log(`File uploaded successfully. ${Location}`);
+  return {  
+    id,
+    url: Location,
+    size: Buffer.byteLength(buffer),
+    type
+  };
 };
 
 app.get('/', (_, res) => {
@@ -68,20 +72,20 @@ app.get('/', (_, res) => {
 });
 
 app.post('/upload', async (req, res) => {
-  const body = req.body;
-  if (!body.file) {
+  const { file, description } = req.body;
+  if (!file) {
     return res.status(400).json({
       ok: false,
-      message: 'Field "file" not found in body',
+      message: 'Object "file" not found in body',
       code: 400
     });
   }
   try {
-    const { id, result } = await uploadBase64ToS3(body.file);
-    await dbInsertQuery(id, body.description);
+    const { id, url, size, type } = await uploadBase64ToS3(file);
+    await dbInsertQuery(id, description, size, type);
     res.status(201).send({
       ok: true,
-      data: { id, url: result.Location }
+      data: { id, url, description }
     });
   } catch(err) {
     console.log(err.stack);

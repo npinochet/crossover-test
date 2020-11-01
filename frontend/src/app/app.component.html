@@ -1,15 +1,36 @@
-<div class="container">
-  <div class="upload-section">
-    <label>
-      <input
-        type="file"
-        (change)="fileUploadOnChange($event.target)"
-        id="fileInput"
-        accept=".jpg, .png, .jpeg"
+<div class="main">
+  <div class="container" [class.container-no-height]="uploaded">
+    <div class="title">
+      <h1>AWESOME IMAGE UPLOADER</h1>
+    </div>
+    <div class="form-container">
+      <div class="upload">
+        <label for="fileInput" class="custom-file-upload">
+          Select an image
+        </label>
+        <input
+          type="file"
+          (change)="fileUploadOnChange($event.target)"
+          id="fileInput"
+          accept=".jpg, .png, .jpeg"
+        >
+      </div>
+      <div class="description">
+        <label>Add a description</label>
+        <input #descriptionInput type="text">
+      </div>
+      <p class="error-message">{{ errorMessage }}</p>
+      <button
+        [disabled]="uploading"
+        class="button"
+        (click)="uploadFile(descriptionInput.value)"
       >
-    </label>
-    <p>(.PNG, .JPEG, .JPG, Max {{ fileMaxSizeKB }}KB)</p>
-    <p>{{ errorMessage }}</p>
-    <button class="button-link" (click)="uploadFile()">Upload Image</button>
+        Upload Image
+      </button>
+    </div>
+  </div>
+  <div class="uploaded-image" *ngIf="uploaded">
+    <img src="{{ fileSrc }}">
+    <p><i>{{ fileDescription }}</i></p>
   </div>
 </div>

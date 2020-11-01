@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UploadService } from '@services/upload.service';
 import { MAX_FILE_SIZE, ALLOWED_FILE_TYPES } from './constants';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -9,8 +10,12 @@ import { MAX_FILE_SIZE, ALLOWED_FILE_TYPES } from './constants';
 })
 export class AppComponent implements OnInit {
   public fileMaxSizeKB = MAX_FILE_SIZE;
-  public file: File;
+  public fileSelected: File;
   public errorMessage: string = '';
+  public uploading: boolean = false;
+  public uploaded: boolean = false;
+  public fileSrc: string;
+  public fileDescription: string;
 
   constructor(
     private uploadService: UploadService
@@ -30,23 +35,33 @@ export class AppComponent implements OnInit {
       this.errorMessage = 'File max size exceeded';
       return false;
     }
+    this.errorMessage = '';
     return true;
   }
 
   public fileUploadOnChange(fileUpload: any): void {
     const file = fileUpload.files[0];
-    if (this.validateFile(file)) {
-      this.file = file;
-      this.errorMessage = '';
-    }
+    if (this.validateFile(file)) this.fileSelected = file;
   }
 
-  public async uploadFile(): Promise<any> {
-    if (!this.file) return false;
+  public async uploadFile(fileDescription: string): Promise<void> {
+    if (!this.fileSelected || this.uploading) return;
     const uploadFileBody = {
-      file: await this.imageToBase64(this.file),
+      file: await this.imageToBase64(this.fileSelected),
+      description: fileDescription
     };
-    return this.uploadService.uploadFile(uploadFileBody).toPromise();
+    this.uploading = true;
+    this.uploadService.uploadFile(uploadFileBody)
+      .pipe(finalize(() => this.uploading = false))
+      .subscribe(({ ok, data }) => {
+        if (!ok) {
+          this.errorMessage = 'There was an error uploading your image';
+          return;
+        }
+        this.fileSrc = data.url;
+        this.fileDescription = fileDescription;
+        this.uploaded = true;
+      });
   }
 
   public imageToBase64(fileToRead: File): Promise<string> {
