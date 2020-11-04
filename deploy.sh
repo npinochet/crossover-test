@@ -9,7 +9,7 @@ cp env crossover-test/backend/.env
 cd crossover-test/frontend
 npm ci
 npm run build-prod
-aws s3 cp dist/crossover-test-frontend/ s3://crossover-test-bucket/
+aws s3 cp dist/crossover-test-frontend/ s3://crossover-test-dist/ --recursive --acl public-read
 
 # Run backend
 cd ../backend
