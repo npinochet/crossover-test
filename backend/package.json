@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha *.spec.*",
-    "coverage": "nyc --reporter=text --reporter=text-summary npm run test",
+    "coverage": "nyc npm run test",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint \"**/*.js\""
@@ -35,12 +35,5 @@
   },
   "engines": {
     "node": "10.16.0"
-  },
-  "nyc": {
-    "exclude": [
-      "*.spec.*"
-    ],
-    "lines": 80,
-    "branches": 90
   }
 }
