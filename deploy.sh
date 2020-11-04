@@ -3,7 +3,7 @@ set -e
 
 # Clone repo
 git clone https://github.com/npinochet/crossover-test.git
-cp env crossover/backend/.env
+cp env crossover-test/backend/.env
 
 # Build and deploy frontend on S3
 cd crossover-test/frontend
