@@ -3,12 +3,12 @@ on: [push]
 jobs:
   backend-node:
     runs-on: ubuntu-16.04
+    defaults:
+      run:
+        working-directory: ./backend
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Access Backend
-        run: cd backend
 
       - name: Set up Node
         uses: actions/setup-node@v1
@@ -29,12 +29,12 @@ jobs:
 
   frontend-angular:
     runs-on: ubuntu-16.04
+    defaults:
+      run:
+        working-directory: ./frontend
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Access Backend
-        run: cd backend
 
       - name: Set up Node
         uses: actions/setup-node@v1
