@@ -1,7 +1,7 @@
 #/bin/bash
 
 # Clone repo
-git clone URL_GITHUB
+git clone https://github.com/npinochet/crossover-test.git
 
 # Build and deploy frontend on S3
 cd crossover-test/frontend
