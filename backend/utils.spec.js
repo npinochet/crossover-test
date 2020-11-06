@@ -109,6 +109,7 @@ describe('Utils', () => {
         Body: Buffer.alloc(1),
         ContentEncoding: 'base64',
         ContentType: 'image/png',
+        ACL: 'public-read',
       };
       sinon.assert.calledWith(uploadStub, params);
     });
