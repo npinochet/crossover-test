@@ -38,6 +38,7 @@ const uploadBase64ToS3 = async (s3, base64) => {
     Body: buffer,
     ContentEncoding: 'base64',
     ContentType: `image/${type}`,
+    ACL: 'public-read',
   };
   const { Location } = await s3.upload(params).promise();
   console.log(`File uploaded successfully. ${Location}`);

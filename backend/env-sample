@@ -7,4 +7,4 @@ RDS_PASSWORD=XXXXXXXXX
 RDS_NAME=Main
 RDS_PORT=3306
 RDS_USER=admin
-CORS_ORIGIN=https://du6eamaktejxq.cloudfront.net
+CORS_ORIGIN=http://crossover-test-dist.s3-website.us-east-2.amazonaws.com
