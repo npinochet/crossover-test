@@ -44,10 +44,15 @@ export class AppComponent implements OnInit {
     if (this.validateFile(file)) this.fileSelected = file;
   }
 
-  public async uploadFile(fileDescription: string): Promise<void> {
-    if (!this.fileSelected || this.uploading) return;
+  public async uploadFile(): Promise<void> {
+    this.errorMessage = '';
+    if (this.uploading) return;
+    if (!this.fileSelected || !this.fileDescription) {
+      this.errorMessage = 'An image and description is required';
+      return;
+    }
     this.uploading = true;
-    this.uploadService.uploadFile(await this.imageToBase64(this.fileSelected), fileDescription)
+    this.uploadService.uploadFile(await this.imageToBase64(this.fileSelected), this.fileDescription)
       .pipe(finalize(() => this.uploading = false))
       .subscribe(({ ok, data }) => {
         if (!ok) {
@@ -55,7 +60,6 @@ export class AppComponent implements OnInit {
           return;
         }
         this.fileSrc = data.url;
-        this.fileDescription = fileDescription;
         this.uploaded = true;
       });
   }

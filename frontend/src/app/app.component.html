@@ -18,13 +18,13 @@
       </div>
       <div class="description">
         <label>Add a description</label>
-        <input #descriptionInput type="text" required>
+        <input [(ngModel)]="fileDescription" type="text" required>
       </div>
       <p class="error-message">{{ errorMessage }}</p>
       <button
-        [disabled]="uploading || !descriptionInput.value"
+        [disabled]="uploading"
         class="button"
-        (click)="uploadFile(descriptionInput.value)"
+        (click)="uploadFile()"
       >
         Upload Image
       </button>
