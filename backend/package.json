@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha *.spec.*",
     "coverage": "nyc npm run test",
-    "start": "node index.js",
+    "start": "npm run dev",
     "dev": "nodemon index.js",
     "lint": "eslint \"**/*.js\""
   },

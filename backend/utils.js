@@ -19,6 +19,16 @@ const dbInsertQuery = (pool, dbName, id, desc, size, type) => (
   })
 );
 
+const dbDeleteQuery = (pool, dbName, id) => (
+  new Promise((res) => {
+    const query = `DELETE FROM ${dbName} WHERE UUID=?;`;
+    pool.query(query, [id], (err) => {
+      if (err) console.warn(`Error trying to delete '${id}' from RDS`, err);
+      res();
+    });
+  })
+);
+
 const uploadBase64ToS3 = async (s3, base64) => {
   const { buffer, type } = module.exports.getBase64Buffer(base64);
   const id = uuid.v4();
@@ -39,8 +49,23 @@ const uploadBase64ToS3 = async (s3, base64) => {
   };
 };
 
+const deleteS3 = async (s3, id) => {
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: id,
+  };
+  try {
+    await s3.headObject(params).promise();
+    await s3.deleteObject(params).promise();
+  } catch (err) {
+    console.warn(`Error trying to delete '${id}' from S3`, err);
+  }
+};
+
 module.exports = {
   getBase64Buffer,
   dbInsertQuery,
+  dbDeleteQuery,
   uploadBase64ToS3,
+  deleteS3,
 };

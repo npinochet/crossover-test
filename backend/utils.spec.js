@@ -52,6 +52,33 @@ describe('Utils', () => {
     });
   });
 
+  describe('dbDeleteQuery', () => {
+    const mysqlPool = mysql.createPool({ host: 'localhost' });
+    let queryStub;
+    let consoleStub;
+
+    beforeEach(() => {
+      queryStub = sinon.stub(mysqlPool, 'query');
+      consoleStub = sinon.stub(console, 'warn');
+    });
+    afterEach(() => {
+      queryStub.restore();
+      consoleStub.restore();
+    });
+
+    it('should query the given data', async () => {
+      queryStub.yields(null, 'OK');
+      await utils.dbDeleteQuery(mysqlPool, 'test', 'id');
+      sinon.assert.calledWith(queryStub, 'DELETE FROM test WHERE UUID=?;', ['id']);
+    });
+
+    it('should output error if query fails', async () => {
+      queryStub.yields('ERROR', null);
+      await utils.dbDeleteQuery(mysqlPool, 'test', 'id');
+      sinon.assert.calledWith(consoleStub, 'Error trying to delete \'id\' from RDS', 'ERROR');
+    });
+  });
+
   describe('uploadBase64ToS3', () => {
     const s3 = new AWS.S3();
     let getBufferStub;
@@ -84,6 +111,51 @@ describe('Utils', () => {
         ContentType: 'image/png',
       };
       sinon.assert.calledWith(uploadStub, params);
+    });
+  });
+
+  describe('deleteS3', () => {
+    const s3 = new AWS.S3();
+    let headObject;
+    let deleteObject;
+    let consoleStub;
+
+    beforeEach(() => {
+      headObject = sinon.stub(s3, 'headObject')
+        .returns({ promise: () => Promise.resolve() });
+      deleteObject = sinon.stub(s3, 'deleteObject')
+        .returns({
+          promise: () => Promise.resolve({ Location: 'url' }),
+        });
+      consoleStub = sinon.stub(console, 'warn');
+    });
+    afterEach(() => {
+      headObject.restore();
+      deleteObject.restore();
+      consoleStub.restore();
+    });
+
+    it('should delete from s3 if file exists', async () => {
+      await utils.deleteS3(s3, 'id');
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: 'id',
+      };
+      sinon.assert.calledWith(headObject, params);
+      sinon.assert.calledWith(deleteObject, params);
+    });
+
+    it('should not delete if file does not exist', async () => {
+      const err = Error('ERROR');
+      headObject.returns({ promise: () => Promise.reject(err) });
+      await utils.deleteS3(s3, 'id');
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: 'id',
+      };
+      sinon.assert.calledWith(headObject, params);
+      sinon.assert.notCalled(deleteObject);
+      sinon.assert.calledWith(consoleStub, 'Error trying to delete \'id\' from S3', err);
     });
   });
 });

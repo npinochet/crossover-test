@@ -1,12 +1,19 @@
 require('dotenv').config();
+
+const PROD = process.env.NODE_ENV === 'production';
+
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql');
 const morgan = require('morgan');
+const mysqlR = require('mysql');
 const AWS = require('aws-sdk');
 
 const pkg = require('./package.json');
 const utils = require('./utils');
+const mocks = require('./mocks');
+
+const mysql = PROD ? mysqlR : mocks.mysqlMock;
+const origin = PROD ? process.env.CORS_ORIGIN : '*';
 
 AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -26,8 +33,10 @@ const pool = mysql.createPool({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin }));
 app.use(morgan('combined'));
+
+const buildError = (ok, message, code) => ({ ok, message, code });
 
 app.get('/', (_, res) => {
   res.send(`Crossover file upload running, version: ${pkg.version}`);
@@ -36,26 +45,27 @@ app.get('/', (_, res) => {
 app.post('/upload', async (req, res) => {
   const { file, description } = req.body;
   if (!file) {
-    return res.status(400).json({
-      ok: false,
-      message: 'Object "file" not found in body',
-      code: 400,
-    });
+    const errData = buildError(false, 'Object "file" not found in body', 400);
+    return res.status(400).json(errData);
   }
+  let key;
+  let s3Uploaded = false;
+  let rdsInserted = false;
   try {
     const { id, url, size, type } = await utils.uploadBase64ToS3(s3, file);
+    key = id;
+    s3Uploaded = true;
     await utils.dbInsertQuery(pool, 'Images', id, description, size, type);
-    res.status(201).send({
+    rdsInserted = true;
+    res.status(201).json({
       ok: true,
       data: { id, url, description },
     });
   } catch (err) {
+    if (s3Uploaded) utils.deleteS3(s3, key);
+    if (rdsInserted) utils.dbDeleteQuery(pool, 'Images', key);
     console.warn(err.stack);
-    res.status(500).send({
-      ok: false,
-      message: err.message,
-      code: 500,
-    });
+    res.status(500).json(buildError(false, err.message, 500));
   }
 });
 
