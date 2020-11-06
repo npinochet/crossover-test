@@ -13,15 +13,16 @@
           (change)="fileUploadOnChange($event.target)"
           id="fileInput"
           accept=".jpg, .png, .jpeg"
+          required
         >
       </div>
       <div class="description">
         <label>Add a description</label>
-        <input #descriptionInput type="text">
+        <input #descriptionInput type="text" required>
       </div>
       <p class="error-message">{{ errorMessage }}</p>
       <button
-        [disabled]="uploading"
+        [disabled]="uploading || !descriptionInput.value"
         class="button"
         (click)="uploadFile(descriptionInput.value)"
       >

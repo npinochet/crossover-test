@@ -1,18 +1,21 @@
 #/bin/bash
 set -e
 
-# Clone repo
-git clone https://github.com/npinochet/crossover-test.git
-cp env crossover-test/backend/.env
+# Pull repo
+git pull origin master
+
+# Make sure you have an up to date env file in parent folder
+cp ../env backend/.env
 
 # Build and deploy frontend on S3
-cd crossover-test/frontend
+cd frontend
 npm ci
 npm run build-prod
 aws s3 cp dist/crossover-test-frontend/ s3://crossover-test-dist/ --recursive --acl public-read
 
-# Run backend
+# Run backend with forever
 cd ../backend
 npm ci
 npm install forever -g
+forever stopall
 NODE_ENV=production forever -l node.log -o out.log -e err.log start index.js

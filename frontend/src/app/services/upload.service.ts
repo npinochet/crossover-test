@@ -11,7 +11,8 @@ export class UploadService {
     private http: HttpClient,
   ) { }
 
-  public uploadFile(body: any, ): Observable<any> {
+  public uploadFile(file: string, description: string): Observable<any> {
+    const body = { file, description };
     return this.http.post(BASE_BACKEND + '/upload', body);
   }
 }

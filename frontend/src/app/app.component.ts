@@ -46,12 +46,8 @@ export class AppComponent implements OnInit {
 
   public async uploadFile(fileDescription: string): Promise<void> {
     if (!this.fileSelected || this.uploading) return;
-    const uploadFileBody = {
-      file: await this.imageToBase64(this.fileSelected),
-      description: fileDescription
-    };
     this.uploading = true;
-    this.uploadService.uploadFile(uploadFileBody)
+    this.uploadService.uploadFile(await this.imageToBase64(this.fileSelected), fileDescription)
       .pipe(finalize(() => this.uploading = false))
       .subscribe(({ ok, data }) => {
         if (!ok) {
