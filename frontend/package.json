@@ -1,18 +1,18 @@
 {
   "name": "crossover-test-frontend",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "npm run serve",
-    "build": "ng build",
-    "build-prod": "ng build --prod --build-optimizer=false",
-    "test": "ng test",
-    "test-ci": "npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI",
+    "test": "npm run environment:local; ng test",
+    "test:ci": "npm run environment:local; npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve": "npm run serve:local",
     "serve:local": "npm run environment:local; ng serve --configuration=local --host 0.0.0.0 --port 8080",
     "serve:prod": "npm run environment:prod; ng serve --configuration=production",
+    "build:local": "npm run environment:local; ng build",
+    "build:prod": "npm run environment:prod; ng build --prod --build-optimizer=false",
     "environment:local": "cp src/environments/environment.local.ts src/environments/environment.ts",
     "environment:prod": "cp src/environments/environment.prod.ts src/environments/environment.ts"
   },

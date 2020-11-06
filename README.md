@@ -2,10 +2,12 @@
 
 [![CI](https://github.com/npinochet/crossover-test/workflows/CI/badge.svg)](https://github.com/npinochet/crossover-test/actions)
 
-A simple web app to upload images using Node in the back-end and Angular in the front-end, all deployed using Amazon Web Services. As detailed [here](https://docs.google.com/document/d/1Sdc_vAShKVCY-lSkFg9-6-YUYvv3pma419sucMo7vd0/edit#bookmark=id.a7axd1qcy23)
+A simple web app to upload images using Node in the back-end and Angular in the front-end, all deployed using Amazon Web Services. As detailed [here](https://docs.google.com/document/d/1Sdc_vAShKVCY-lSkFg9-6-YUYvv3pma419sucMo7vd0/edit#bookmark=id.a7axd1qcy23).
 
 Deployed URL: https://du6eamaktejxq.cloudfront.net
+
 Repository: https://github.com/npinochet/crossover-test
+
 [C4_Model](./docs/C4_model.png)
 
 ## Stack
