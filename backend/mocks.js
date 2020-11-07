@@ -4,7 +4,7 @@ const mysqlMock = {
   createPool: () => ({
     query: (sqlSquery, vars, callback) => {
       mysqlStack.push([sqlSquery, vars]);
-      callback('OK', null);
+      callback(null, 'OK');
     },
   }),
 };

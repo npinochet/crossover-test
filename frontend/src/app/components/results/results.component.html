@@ -1,0 +1,27 @@
+<div>
+  <div *ngIf="noResults" class="no-results">
+    <h2>No Results</h2>
+  </div>
+  <div *ngIf="!noResults">
+    <div
+      class="infinite-scroll"
+      infinite-scroll
+      [infiniteScrollDistance]="scrollDistance"
+      [infiniteScrollThrottle]="scrollThrottle"
+      (scrolled)="onScrollDown()"
+    >
+      <div *ngFor="let image of images" class="image-box">
+        <p class="description">
+          <i>{{ image.description }}</i>
+        </p>
+        <img [src]="image.url" class="image">
+        <div class="data">
+          <p class="type">Type: {{ image.type | uppercase}} </p>
+          &nbsp;&nbsp;
+          <p class="size">Size: {{ format_size(image.size) }}KB</p>
+        </div>
+      </div>
+    </div>
+    <div class="loader"></div>
+  </div>
+</div>

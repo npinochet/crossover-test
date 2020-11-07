@@ -3,6 +3,7 @@ const { expect } = require('chai')
 const sinon = require('sinon');
 const mysql = require('mysql');
 const AWS = require('aws-sdk');
+const https = require('https');
 const utils = require('./utils');
 
 describe('Utils', () => {
@@ -157,6 +158,47 @@ describe('Utils', () => {
       sinon.assert.calledWith(headObject, params);
       sinon.assert.notCalled(deleteObject);
       sinon.assert.calledWith(consoleStub, 'Error trying to delete \'id\' from S3', err);
+    });
+  });
+
+  describe('httpsGet', () => {
+    let requestStub;
+    const reqStub = { on: sinon.stub(), end: sinon.stub() };
+    const respStub = { on: sinon.stub() };
+
+    beforeEach(() => {
+      requestStub = sinon.stub(https, 'request').returns(reqStub).yields(respStub);
+    });
+    afterEach(() => {
+      requestStub.restore();
+    });
+
+    it('should make an https request to url', async () => {
+      respStub.on.withArgs('end').yields();
+      respStub.on.withArgs('data').yields('{"data": "RESPONSE"}');
+      const data = { query: 'test' };
+      const { resp, body } = await utils.httpsGet('https://test.com/hi', data);
+      const params = {
+        method: 'GET',
+        hostname: 'test.com',
+        path: '/hi',
+        port: null,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(JSON.stringify(data)),
+        },
+      };
+      expect(body.data).to.be.string('RESPONSE');
+      sinon.assert.calledWith(requestStub, params);
+      sinon.assert.calledWith(resp.on, 'data');
+      sinon.assert.calledWith(resp.on, 'end');
+      sinon.assert.calledWith(reqStub.end, JSON.stringify(data));
+    });
+
+    it('should reject and error if there request fails', () => {
+      respStub.on.withArgs('error').yields('ERROR');
+      expect(utils.httpsGet('https://test.com/hi', {})).to.rejectedWith('ERROR');
+      sinon.assert.calledOnce(requestStub);
     });
   });
 });

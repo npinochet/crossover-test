@@ -43,11 +43,12 @@ describe('Index', () => {
 
     it('should upload file to s3', async () => {
       const res = await request(app).post('/upload').send(reqBody);
+      const { id, url, description } = res.body.data;
       expect(res.status).to.be.equal(201);
       expect(res.ok).to.be.true;
-      expect(res.body.data.id).to.be.equal(s3Return.id);
-      expect(res.body.data.url).to.be.equal(s3Return.url);
-      expect(res.body.data.description).to.be.string('blabla');
+      expect(id).to.be.string(s3Return.id);
+      expect(url).to.be.string(s3Return.url);
+      expect(description).to.be.string(reqBody.description);
       sinon.assert.calledOnce(uploadS3Stub);
       sinon.assert.calledOnce(queryStub);
     });
@@ -75,6 +76,39 @@ describe('Index', () => {
       expect(res.ok).to.be.false;
       sinon.assert.calledOnce(deleteS3Stub);
       sinon.assert.notCalled(deleteQueryStub);
+    });
+  });
+
+  describe('Get /images', () => {
+    const mockUuid = 'test_uuid';
+    const resBody = { hits: { hits: [{ _source: { uuid: mockUuid } }] } };
+    let httpsStub;
+
+    beforeEach(() => {
+      httpsStub = sinon.stub(utils, 'httpsGet')
+        .resolves({ resp: { statusCode: 200 }, body: resBody });
+    });
+    afterEach(() => {
+      httpsStub.restore();
+    });
+
+    it('should make call to AWS elastic search service', async () => {
+      const res = await request(app).get('/images').query({ q: '' });
+      const { uuid, url } = res.body.data[0];
+      expect(res.status).to.be.equal(200);
+      expect(res.ok).to.be.true;
+      expect(uuid).to.be.string(mockUuid);
+      expect(url)
+        .to.be.string(`http://${process.env.S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com/${mockUuid}`);
+      sinon.assert.calledOnce(httpsStub);
+    });
+
+    it('should error if there is a problem requesting AWS ES', async () => {
+      httpsStub.rejects(new Error('Error'));
+      const res = await request(app).get('/images');
+      expect(res.status).to.be.equal(500);
+      expect(res.ok).to.be.false;
+      expect(res.body.message).to.be.string('Error');
     });
   });
 });

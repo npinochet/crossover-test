@@ -1,47 +1,13 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  transition: height 1s;
-  transition-timing-function: ease-out;
+.header, .item {
+  margin: 10px;
 }
 
-.container-no-height {
-  height: 230px;
-}
-
-.form-container {
+.actions {
   display: flex;
-  flex-direction: column;
-  max-width: 500px;
-}
-
-.upload {
-  display: flex;
-  align-items: center;
+  justify-content: space-around;
   margin: 10px 0;
 }
 
-.button {
-  margin: 10px 0;
-  width: max-content;
-}
-
-.description {
-  display: flex;
-  flex: 1;
-  align-items: center;
-}
-
-.uploaded-image {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.error-message {
-  color: var(--color-red);
+.item {
+  margin: 10px;
 }

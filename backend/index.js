@@ -55,7 +55,7 @@ app.post('/upload', async (req, res) => {
     const { id, url, size, type } = await utils.uploadBase64ToS3(s3, file);
     key = id;
     s3Uploaded = true;
-    await utils.dbInsertQuery(pool, 'Images', id, description, size, type);
+    await utils.dbInsertQuery(pool, 'Images', id, description, type, size);
     rdsInserted = true;
     res.status(201).json({
       ok: true,
@@ -65,6 +65,25 @@ app.post('/upload', async (req, res) => {
     if (s3Uploaded) utils.deleteS3(s3, key);
     if (rdsInserted) utils.dbDeleteQuery(pool, 'Images', key);
     console.warn(err.stack);
+    res.status(500).json(buildError(false, err.message, 500));
+  }
+});
+
+app.get('/images', async (req, res) => {
+  const { q, size, type, pageSize, page } = req.query;
+  const itemSize = pageSize || 20;
+  const query = { from: (page || 0) * itemSize, size: itemSize };
+  if (q || size || type) {
+    query.query = { fuzzy: { description: q, size, type } };
+  }
+  try {
+    const { resp, body } = await utils.httpsGet(process.env.ES_SEARCH_ENDPOINT, query);
+    if (resp.statusCode !== 200) throw new Error({ message: resp.statusMessage, body });
+    const bucketUrl = `http://${process.env.S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com/`;
+    const images = body.hits.hits.map((v) => ({ url: bucketUrl + v._source.uuid, ...v._source }));
+    res.status(resp.statusCode).json({ ok: true, data: images });
+  } catch (err) {
+    console.warn(err);
     res.status(500).json(buildError(false, err.message, 500));
   }
 });
