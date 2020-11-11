@@ -72,8 +72,19 @@ app.get('/images', async (req, res) => {
   const itemSize = pageSize || 20;
   const query = { from: (page || 0) * itemSize, size: itemSize };
   const must = [];
-  if (q) must.push({ fuzzy: { description: q } });
-  if (type) must.push({ fuzzy: { type } });
+  if (q) {
+    const match = {
+      match: {
+        description: {
+          query: q,
+          fuzziness: 'auto',
+          operator: 'and',
+        },
+      },
+    };
+    must.push(match);
+  }
+  if (type) must.push({ match: { type } });
   if (maxSize) must.push({ range: { size: { lte: maxSize } } });
   if (must.length > 0) query.query = { bool: { must } };
   try {
