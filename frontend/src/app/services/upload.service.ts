@@ -42,7 +42,7 @@ export class UploadService {
         this.reset();
         this.lastQuery = params;
         this.results = res.data;
-        this.fetchedNoResults = this.results.length <= 0;
+        this.fetchedNoResults = res.data.length < this.pageSize;
         return res;
       }),
       catchError(() => { throw Error('There was an error fetching the images'); })
@@ -56,6 +56,7 @@ export class UploadService {
       map((res: IResponse) => {
         if (!res.ok) throw Error();
         this.results = this.results.concat(res.data);
+        this.fetchedNoResults = res.data.length <= 0;
         return res;
       }),
       catchError(() => { throw Error('There was an error fetching the next page of images'); })

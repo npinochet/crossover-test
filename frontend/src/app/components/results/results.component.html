@@ -1,9 +1,9 @@
 <div>
-  <div *ngIf="noResults" class="no-results">
+  <div *ngIf="images.length <= 0 && noResults" class="no-results">
     <h2>No Results</h2>
   </div>
-  <div *ngIf="!noResults">
-    <h2 class="no-results" *ngIf="images.length > 0">Results</h2>
+  <div *ngIf="images.length > 0">
+    <h2 class="no-results">Results</h2>
     <div
       class="container"
       infinite-scroll
@@ -23,6 +23,6 @@
         </div>
       </div>
     </div>
-    <div *ngIf="false" class="loader"></div>
+    <div *ngIf="!noResults" class="loader"></div>
   </div>
 </div>

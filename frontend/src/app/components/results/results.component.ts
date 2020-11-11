@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { UploadService } from '@services/upload.service';
 import { IImage } from '@models/interfaces';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-results',
@@ -8,16 +9,20 @@ import { IImage } from '@models/interfaces';
   styleUrls: ['./results.component.css']
 })
 export class ResultsComponent {
+  public fetching: boolean = false;
   public scrollDistance: number = 2;
-  public scrollThrottle: number = 300;
+  public scrollThrottle: number = 500;
 
   constructor(
     private uploadService: UploadService,
   ) { }
 
   public onScrollDown(): void {
-    console.log('Scrolled down!');
-    this.uploadService.fetchNext();
+    if (this.fetching || this.noResults) return;
+    this.fetching = true;
+    this.uploadService.fetchNext()
+      .pipe(finalize(() => this.fetching = false))
+      .subscribe();
   }
 
   public format_size(size: number): string {
