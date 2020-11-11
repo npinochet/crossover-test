@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="description">
+    <label>Description</label>
+    <input [(ngModel)]="descriptionQuery">
+  </div>
+  <div class="options">
+    <label>Type</label>
+    <div class="type">
+      <select [(ngModel)]="type">
+        <option>All</option>
+        <option>png</option>
+        <option>jpeg</option>
+      </select>
+    </div>
+    <label>Max Size</label>
+    <input type="number" pattern="[0-9]" [(ngModel)]="sizeQuery">
+    <p>&nbsp;KB</p>
+  </div>
+  <p class="error-message">{{ errorMessage }}</p>
+  <button
+    class="button"
+    (click)="search()"
+    [disabled]="searching"
+  >
+    Search
+  </button>
+</div>

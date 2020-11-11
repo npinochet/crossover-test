@@ -1,0 +1,34 @@
+.no-results {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-box {
+  padding: 20px;
+  width: 40vw;
+  max-height: 500px;
+}
+
+.image {
+  display: flex;
+  max-width: 40vw;
+  max-height: 40vh;
+  margin: auto;
+}
+
+.description {
+  display: flex;
+  justify-content: center;
+}
+
+.data {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}

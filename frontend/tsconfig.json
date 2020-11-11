@@ -20,7 +20,8 @@
       "@app/*": ["src/app/*"],
       "@components/*": ["src/app/components/*"],
       "@services/*": ["src/app/services/*"],
-      "@environments/*": ["src/environments/*"]
+      "@environments/*": ["src/environments/*"],
+      "@models/*": ["src/app/models/*"]
     }
   }
 }

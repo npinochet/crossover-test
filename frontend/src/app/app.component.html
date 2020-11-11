@@ -1,37 +1,10 @@
-<div class="main">
-  <div class="container" [class.container-no-height]="uploaded">
-    <div class="title">
-      <h1>Nice Image Uploader</h1>
-    </div>
-    <div class="form-container">
-      <div class="upload">
-        <label for="fileInput" class="custom-file-upload">
-          Select an image
-        </label>
-        <input
-          type="file"
-          (change)="fileUploadOnChange($event.target)"
-          id="fileInput"
-          accept=".jpg, .png, .jpeg"
-          required
-        >
-      </div>
-      <div class="description">
-        <label>Add a description</label>
-        <input [(ngModel)]="fileDescription" type="text" required>
-      </div>
-      <p class="error-message">{{ errorMessage }}</p>
-      <button
-        [disabled]="uploading"
-        class="button"
-        (click)="uploadFile()"
-      >
-        Upload Image
-      </button>
-    </div>
+<div class="container">
+  <div class="header">
+    <a href="/"><h1>Nice Image Gallery</h1></a>
   </div>
-  <div class="uploaded-image" *ngIf="uploaded">
-    <img src="{{ fileSrc }}">
-    <p><i>{{ fileDescription }}</i></p>
+  <div class="actions">
+    <app-uploader class="item"></app-uploader>
+    <app-searcher class="item"></app-searcher>
   </div>
+  <app-results></app-results>
 </div>
