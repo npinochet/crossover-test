@@ -22,18 +22,18 @@ export class UploadService {
   public uploadFile(file: string, description: string): Observable<any> {
     const body = { file, description };
     return this.http.post(BASE_BACKEND + '/upload', body).pipe(
-      map((res: IResponse) => { if (!res.ok) throw Error(); }),
+      map((res: IResponse) => { if (!res.ok) throw Error(); return res; }),
       catchError(() => { throw Error('There was an error uploading your image'); })
     );
   }
 
-  public fetchFiles(descQuery: string, type: string, size: number, page: number = 0): Observable<any> {
+  public fetchFiles(descQuery: string, type: string, maxSize: number, page: number = 0): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', this.pageSize.toString());
 
     if (descQuery) params = params.set('q', descQuery);
-    if (size) params = params.set('size', size.toString());
+    if (maxSize) params = params.set('maxSize', maxSize.toString());
     if (type) params = params.set('type', type);
 
     return this.http.get(BASE_BACKEND + '/images', { params }).pipe(
@@ -43,6 +43,7 @@ export class UploadService {
         this.lastQuery = params;
         this.results = res.data;
         this.fetchedNoResults = this.results.length <= 0;
+        return res;
       }),
       catchError(() => { throw Error('There was an error fetching the images'); })
     );
@@ -55,6 +56,7 @@ export class UploadService {
       map((res: IResponse) => {
         if (!res.ok) throw Error();
         this.results = this.results.concat(res.data);
+        return res;
       }),
       catchError(() => { throw Error('There was an error fetching the next page of images'); })
     );

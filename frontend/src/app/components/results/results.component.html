@@ -3,8 +3,9 @@
     <h2>No Results</h2>
   </div>
   <div *ngIf="!noResults">
+    <h2 class="no-results" *ngIf="images.length > 0">Results</h2>
     <div
-      class="infinite-scroll"
+      class="container"
       infinite-scroll
       [infiniteScrollDistance]="scrollDistance"
       [infiniteScrollThrottle]="scrollThrottle"
@@ -12,7 +13,7 @@
     >
       <div *ngFor="let image of images" class="image-box">
         <p class="description">
-          <i>{{ image.description }}</i>
+          <i><b>{{ image.description }}</b></i>
         </p>
         <img [src]="image.url" class="image">
         <div class="data">
@@ -22,6 +23,6 @@
         </div>
       </div>
     </div>
-    <div class="loader"></div>
+    <div *ngIf="false" class="loader"></div>
   </div>
 </div>

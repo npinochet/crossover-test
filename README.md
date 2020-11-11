@@ -43,10 +43,19 @@ To run the back-end and front-end you can open two terminals and run:
 ```bash
 $ npm start
 ````
-on each of the `frontend` and `backend` folders. Or use bash's job control system and run:
+On each of the `frontend` and `backend` folders. Or use bash's job control system and run:
 ```bash
 $ npm start --prefix backend & npm start --prefix frontend &
 ```
-There's also a `deploy.sh` script to run on a AWS EC2 instance to build the front-end and upload it to an AWS S3 bucket and it also start's the back-end on the instance.
+There's also a `deploy.sh` script to run on a AWS EC2 instance to build and upload the front-end to an AWS S3 bucket and it also start's the back-end on the instance.
+
+### Running locally
+
+If there is a need to run the app locally and you have the AWS Elastic Search instance and/or the AWS RDS instance on the internal AWS VPC, you can access them through an ssh tunnel on the EC2 instance like so:
+```bash
+ssh -i ec2-key.pem ec2_user@ec2-18-222-149-250.us-east-2.compute.amazonaws.com -L 8001:vpc-crossover-bmb3metkdfnofvrbu7vxkmkpaa.us-east-2.es.amazonaws.com:80 -L 3306:database-crossover.cyou7lbdmw0u.us-east-2.rds.amazonaws.com:3306
+```
+
+And adjust the `.env` file to use `ES_SEARCH_ENDPOINT=http://localhost:8001/images/_search` and `RDS_HOST=localhost` accordingly.
 
 **Author:** Nicolás Pinochet

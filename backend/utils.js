@@ -1,4 +1,4 @@
-const https = require('https');
+const http = require('http');
 const URL = require('url');
 const uuid = require('uuid');
 
@@ -15,7 +15,10 @@ const dbInsertQuery = (pool, dbName, id, desc, type, size) => (
     const query = `INSERT INTO ${dbName} VALUES (?, ?, ?, ?);`;
     const values = [id, desc, type, size];
     pool.query(query, values, (err, data) => {
-      if (err) throw rej(err);
+      if (err) {
+        console.log(err);
+        rej(err);
+      }
       console.log(`Insert query executed successfully. ${id}`);
       res(data);
     });
@@ -68,7 +71,7 @@ const deleteS3 = async (s3, id) => {
   }
 };
 
-const httpsGet = (url, data) => (
+const httpGet = (url, data) => (
   new Promise((res, rej) => {
     const rawData = JSON.stringify(data);
     const { hostname, path, port } = URL.parse(url);
@@ -82,7 +85,7 @@ const httpsGet = (url, data) => (
         'Content-Length': Buffer.byteLength(rawData),
       },
     };
-    const req = https.request(ops, (resp) => {
+    const req = http.request(ops, (resp) => {
       let body = '';
       resp.on('error', (err) => rej(err));
       resp.on('data', (d) => { body += d; });
@@ -106,5 +109,5 @@ module.exports = {
   dbDeleteQuery,
   uploadBase64ToS3,
   deleteS3,
-  httpsGet,
+  httpGet,
 };

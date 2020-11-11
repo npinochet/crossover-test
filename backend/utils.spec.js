@@ -3,7 +3,7 @@ const { expect } = require('chai')
 const sinon = require('sinon');
 const mysql = require('mysql');
 const AWS = require('aws-sdk');
-const https = require('https');
+const http = require('http');
 const utils = require('./utils');
 
 describe('Utils', () => {
@@ -161,23 +161,23 @@ describe('Utils', () => {
     });
   });
 
-  describe('httpsGet', () => {
+  describe('httpGet', () => {
     let requestStub;
     const reqStub = { on: sinon.stub(), end: sinon.stub() };
     const respStub = { on: sinon.stub() };
 
     beforeEach(() => {
-      requestStub = sinon.stub(https, 'request').returns(reqStub).yields(respStub);
+      requestStub = sinon.stub(http, 'request').returns(reqStub).yields(respStub);
     });
     afterEach(() => {
       requestStub.restore();
     });
 
-    it('should make an https request to url', async () => {
+    it('should make an http request to url', async () => {
       respStub.on.withArgs('end').yields();
       respStub.on.withArgs('data').yields('{"data": "RESPONSE"}');
       const data = { query: 'test' };
-      const { resp, body } = await utils.httpsGet('https://test.com/hi', data);
+      const { resp, body } = await utils.httpGet('http://test.com/hi', data);
       const params = {
         method: 'GET',
         hostname: 'test.com',
@@ -197,7 +197,7 @@ describe('Utils', () => {
 
     it('should reject and error if there request fails', () => {
       respStub.on.withArgs('error').yields('ERROR');
-      expect(utils.httpsGet('https://test.com/hi', {})).to.rejectedWith('ERROR');
+      expect(utils.httpGet('http://test.com/hi', {})).to.rejectedWith('ERROR');
       sinon.assert.calledOnce(requestStub);
     });
   });

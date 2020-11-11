@@ -82,29 +82,29 @@ describe('Index', () => {
   describe('Get /images', () => {
     const mockUuid = 'test_uuid';
     const resBody = { hits: { hits: [{ _source: { uuid: mockUuid } }] } };
-    let httpsStub;
+    let httpStub;
 
     beforeEach(() => {
-      httpsStub = sinon.stub(utils, 'httpsGet')
+      httpStub = sinon.stub(utils, 'httpGet')
         .resolves({ resp: { statusCode: 200 }, body: resBody });
     });
     afterEach(() => {
-      httpsStub.restore();
+      httpStub.restore();
     });
 
     it('should make call to AWS elastic search service', async () => {
-      const res = await request(app).get('/images').query({ q: '' });
+      const res = await request(app).get('/images').query({ q: 'dog', maxSize: 200, type: 'png' });
       const { uuid, url } = res.body.data[0];
       expect(res.status).to.be.equal(200);
       expect(res.ok).to.be.true;
       expect(uuid).to.be.string(mockUuid);
       expect(url)
         .to.be.string(`http://${process.env.S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com/${mockUuid}`);
-      sinon.assert.calledOnce(httpsStub);
+      sinon.assert.calledOnce(httpStub);
     });
 
     it('should error if there is a problem requesting AWS ES', async () => {
-      httpsStub.rejects(new Error('Error'));
+      httpStub.rejects(new Error('Error'));
       const res = await request(app).get('/images');
       expect(res.status).to.be.equal(500);
       expect(res.ok).to.be.false;

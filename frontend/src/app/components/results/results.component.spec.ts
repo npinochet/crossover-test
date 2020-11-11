@@ -12,7 +12,9 @@ describe('ResultsComponent', () => {
       declarations: [ ResultsComponent ],
       providers: [
         {
-          provide: UploadService, useValue: {}
+          provide: UploadService, useValue: {
+            results: [],
+          }
         },
       ]
     })

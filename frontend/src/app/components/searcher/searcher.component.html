@@ -12,8 +12,9 @@
         <option>jpeg</option>
       </select>
     </div>
-    <label>Size</label>
+    <label>Max Size</label>
     <input type="number" pattern="[0-9]" [(ngModel)]="sizeQuery">
+    <p>&nbsp;KB</p>
   </div>
   <p class="error-message">{{ errorMessage }}</p>
   <button

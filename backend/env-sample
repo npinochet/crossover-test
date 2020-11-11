@@ -8,4 +8,4 @@ RDS_NAME=Main
 RDS_PORT=3306
 RDS_USER=admin
 CORS_ORIGIN=http://crossover-test-dist.s3-website.us-east-2.amazonaws.com
-ES_SEARCH_ENDPOINT=https://vpc-crossover-bmb3metkdfnofvrbu7vxkmkpaa.us-east-2.es.amazonaws.com/images/_search?pretty
+ES_SEARCH_ENDPOINT=http://vpc-crossover-bmb3metkdfnofvrbu7vxkmkpaa.us-east-2.es.amazonaws.com/images/_search

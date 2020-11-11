@@ -14,27 +14,30 @@ type = 'entry'
 url = host + '/' + index + '/' + type
 
 headers = { "Content-Type": "application/json" }
-db = mysql.connector.connect(
-  host="database-crossover.cyou7lbdmw0u.us-east-2.rds.amazonaws.com",
-  user="admin",
-  password="XXXXX",
-  database="Main"
-)
+
 # Lambda execution starts here
 def handler(event, context):
-  try:
-    cursor = db.cursor()
-    for record in event['Records']:
-      time.sleep(3) # Wait for S3 metadata to be saved in RDS
-      key = record['s3']['object']['key'] # Get the bucket name and key for the new file
-      cursor.execute("SELECT * FROM Images WHERE UUID=%s", (key,))
-      query = cursor.fetchall()
-      if len(query) > 0:
-        e = query[0]
-        doc = {"uuid": e[0], "description": e[1], "type": e[2], "size": e[3]}
-        r = requests.post(url, auth=awsauth, json=doc, headers=headers)
-        return {"statusCode": r.status_code, "body": r.text}
-
-    return {"statusCode": 404, "body": "Bucket item not found"}
-  except Exception as e:
-    return {"statusCode": 500, "body": "An error occurred", "err": str(e)}
+  print("Event", event)
+  db = mysql.connector.connect(
+    host="database-crossover.cyou7lbdmw0u.us-east-2.rds.amazonaws.com",
+    user="admin",
+    password="XXXXX",
+    database="Main"
+  )
+  cursor = db.cursor()
+  total, uploaded = 0, 0
+  for record in event['Records']:
+    total += 1
+    time.sleep(4) # Wait for S3 metadata to be saved in RDS
+    key = record['s3']['object']['key'] # Get the bucket name and key for the new file
+    cursor.execute("SELECT * FROM Images WHERE UUID=%s", (key,))
+    query = cursor.fetchall()
+    if len(query) > 0:
+      e = query[0]
+      doc = {"uuid": e[0], "description": e[1], "type": e[2], "size": e[3]}
+      r = requests.post(url, auth=awsauth, json=doc, headers=headers)
+      uploaded += 1
+      print("Object Uploaded:", r.status_code, "body", r.text)
+    else:
+      print("Bucket object", key, "not found")
+  return {"statusCode": 200, "body": "Saved "+str(uploaded)+"/"+str(total)+" objects"}

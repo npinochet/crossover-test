@@ -22,8 +22,9 @@ export class SearcherComponent {
     this.errorMessage = '';
     this.searching = true;
     const type = this.type === 'All' ? null : this.type;
-    this.uploadService.fetchFiles(this.descriptionQuery, type, this.sizeQuery)
-    .pipe(finalize(() => this.searching = false))
-    .subscribe({ error: (err) => this.errorMessage = err.message });
+    const sizeQueryKB = this.sizeQuery * 1000;
+    this.uploadService.fetchFiles(this.descriptionQuery, type, sizeQueryKB)
+      .pipe(finalize(() => this.searching = false))
+      .subscribe({ error: (err) => this.errorMessage = err.message });
   }
 }
